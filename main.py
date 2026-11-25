@@ -18,8 +18,24 @@ OUTPUT_PATH = "/output/entry.txt"
 MAX_CHARS = 200
 
 
+def validate_confession(text: str) -> str | None:
+    """Return an error message if the confession line is not clean."""
+    if text != text.strip():
+        return "confession has leading or trailing whitespace"
+    if "$" in text:
+        return "confession must not contain a '$' character"
+    for char in text:
+        if ord(char) < 32 or ord(char) == 127:
+            return "confession contains a control character"
+    return None
+
+
 def main() -> int:
     # The confession must be one line, 1-200 characters, not only whitespace.
+    problem = validate_confession(CONFESSION)
+    if problem is not None:
+        print("error: %s" % problem, file=sys.stderr)
+        return 1
     if not CONFESSION or not CONFESSION.strip():
         print("error: confession is empty", file=sys.stderr)
         return 1
